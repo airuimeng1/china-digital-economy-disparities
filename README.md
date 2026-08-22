@@ -1,16 +1,20 @@
-# Detailed PCA + Factorial MANOVA on China's Provincial Digital Economy
+# Measuring Regional Disparities in China's Digital Economy Development, 2013–2022
 
-**Measuring Regional Disparities in China's Digital Economy Development:
-A Multivariate Analysis Using PCA and Factorial MANOVA, 2013–2022**
+**A Multivariate Analysis Using PCA and Factorial MANOVA**
 
-Airui Meng
-
-![Regional Digital Economy Development Index, 2013–2022](outputs/figures/03_region_trend.png)
+**Airui Meng** · Teachers College, Columbia University
 
 This repository contains the R analysis pipeline, panel data, intermediate outputs, and
 typeset report for a study that constructs a Digital Economy Development Index
 (DEDI) for 31 mainland Chinese provinces, 2013–2022, and tests for regional and temporal
 differences via a 4 × 2 factorial MANOVA on retained principal-component scores.
+
+The DEDI series built here (`outputs/panel_dedi.csv`) is the key regressor in the companion
+panel study [`airuimeng1/digital-economy-employment-upgrading`](https://github.com/airuimeng1/digital-economy-employment-upgrading),
+which asks how digital development relates to the structure of employment. The two series
+agree to 1e-13.
+
+<img src="outputs/figures/03_region_trend.png" width="640" alt="Regional Digital Economy Development Index, 2013-2022">
 
 ---
 
@@ -35,6 +39,22 @@ differences via a 4 × 2 factorial MANOVA on retained principal-component scores
   reflecting the changing composition of "infrastructure" over the decade.
 
 ---
+
+## Interpretation and limitations
+
+The 4 × 2 factorial design treats 310 province-years as independent replicates, but the same 31
+provinces populate every cell and both period cells. Period is therefore a within-subject factor
+fitted with a between-subjects error term, so the reported *F* statistics are anti-conservative
+and the region contrasts rest on 3–12 provinces per group rather than 15–60 observations.
+
+Re-fitting the same model on province × period means (*n* = 62, which removes the year-level
+replication) leaves every qualitative conclusion intact — region Pillai *V* = 0.927,
+*F*(12, 159) = 5.93, *p* < .001; period *V* = 0.895, *F*(4, 51) = 109.10, *p* < .001;
+interaction *V* = 0.056, *F*(12, 159) = 0.25, *p* = .995 — while the *F* statistics fall
+substantially (region by a factor of 4.3, period by 1.8). The Games–Howell contrasts pool
+across periods and share the same assumption, so their *p*-values are descriptive.
+
+Full limitations are in `report/final_report.pdf`, Section 6.
 
 ## Repository structure
 
@@ -117,7 +137,17 @@ install.packages(c(
 ))
 ```
 
-The committed outputs were last regenerated under R 4.5.2. To run the whole pipeline in one command from the repo root:
+The committed outputs were last regenerated under R 4.5.2 with MVN 6.3 (MVN ≥ 6.0 is
+required — the 5.x API used different argument and result names and stage 04 will fail on it),
+car 3.1.5, psych 2.6.1, heplots 1.8.1, rstatix 0.7.3.
+
+To run the whole pipeline in one command from the repo root:
+
+```bash
+Rscript R/run_all.R          # all six stages
+```
+
+Equivalently, stage by stage:
 
 ```bash
 for s in 01_descriptive 02_pca 03_dedi 04_assumptions 05_manova 06_sensitivity; do
@@ -125,7 +155,9 @@ for s in 01_descriptive 02_pca 03_dedi 04_assumptions 05_manova 06_sensitivity; 
 done
 ```
 
-`R/run_all.R` runs the same sequence in-session (`source("R/run_all.R")` from the repo root).
+In an R session (e.g. RStudio), `source("R/run_all.R")` from the repo root does the same.
+The stage scripts resolve `R/00_setup.R` relative to the repository root, so run them from
+there — `cd R && Rscript 02_pca.R` fails with `cannot open file 'R/00_setup.R'`.
 
 To re-typeset the report, `cd report/` and run `pdflatex final_report.tex` twice (any
 TeX Live installation providing `amsmath`, `booktabs`, `tabularx`, `multirow`,
