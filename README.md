@@ -59,7 +59,7 @@ Full limitations are in `report/final_report.pdf`, Section 6.
 ## Repository structure
 
 ```
-detailed-pca-manova-anl/
+china-digital-economy-disparities/
 ├── README.md                       This file.
 ├── LICENSE                         MIT licence for the code.
 ├── data/
@@ -97,7 +97,7 @@ The pipeline is staged so that each step writes intermediate artefacts that the 
 step reads back. Run from the repository root:
 
 ```r
-setwd("path/to/detailed-pca-manova-anl")
+setwd("path/to/china-digital-economy-disparities")
 
 ## Stage 0: shared setup (loaded automatically by each downstream script)
 source("R/00_setup.R")

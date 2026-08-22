@@ -19,7 +19,7 @@ suppressPackageStartupMessages({
 })
 
 ## All paths are relative to the repository root.
-## Scripts assume getwd() is the repo root: setwd("path/to/detailed-pca-manova-anl").
+## Scripts assume getwd() is the repo root: setwd("path/to/china-digital-economy-disparities").
 if (!file.exists("data/panel_data.xlsx"))
   stop("Set the working directory to the repository root before sourcing R/00_setup.R.")
 PROJ_ROOT <- normalizePath(".", mustWork = TRUE)
