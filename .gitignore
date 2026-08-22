@@ -21,3 +21,22 @@ Thumbs.db
 .vscode/
 .idea/
 *.swp
+
+# More LaTeX intermediates
+*.bbl
+*.blg
+*.xdv
+*.bcf
+*.run.xml
+
+# R / RStudio
+.Rproj.user/
+*.Rproj
+.Renviron
+renv/library/
+
+# Office lock files (data/ are WPS workbooks)
+~$*
+
+# macOS resource forks
+._*

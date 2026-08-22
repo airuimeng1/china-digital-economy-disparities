@@ -91,7 +91,8 @@ write.csv(load_tab, file.path(TBL_DIR, "02_pca_loadings.csv"), row.names = FALSE
 scores <- as.data.frame(pca$x[, 1:n_keep])
 colnames(scores) <- paste0("PC", 1:n_keep)
 out <- cbind(df[, c("year","id","province","prov_en","region","period")], scores)
-write.csv(out, file.path(OUT_DIR, "pc_scores.csv"), row.names = FALSE)
+write.csv(out, file.path(OUT_DIR, "pc_scores.csv"), row.names = FALSE,
+          fileEncoding = "UTF-8")
 saveRDS(list(pca = pca, n_keep = n_keep, heavy = heavy,
              eig_tab = eig_tab, load_tab = load_tab,
              vmx = vmx, scores = out, X = X, X_t = X_t, Z = Z, df = df),

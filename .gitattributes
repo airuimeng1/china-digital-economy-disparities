@@ -1,0 +1,4 @@
+# Keep the language bar reflecting the analysis code, not the manuscript or artefacts
+report/final_report.tex linguist-documentation=true
+outputs/** linguist-generated=true
+data/** linguist-generated=true

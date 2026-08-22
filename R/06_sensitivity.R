@@ -35,20 +35,24 @@ for (yr in c(2018, 2019, 2020)) {
     list(manova = m, boxM = if (!inherits(bm, "try-error")) bm else NULL)
 }
 
-## Summary table — capture via printed text and parse numbers from the
-## first row (region) of the test table
+## Summary table — pull the region row out of the Type II test table.
+## car::Manova stores only SSPH/SSPE and forms the Pillai statistic inside its
+## print method, so the printed table is the only place the assembled numbers
+## exist.  Significance stars are switched off first, which guarantees the row
+## tokenises as: term Df stat approxF numDf denDf p.
 extract_pillai <- function(manova_obj) {
-  txt <- capture.output(print(manova_obj))
-  ## find row that starts with "region"
-  reg_line <- txt[grepl("^region", txt)]
-  toks <- strsplit(trimws(reg_line), "\\s+")[[1]]
-  ## tokens: "region" df  test_stat  approx_F  num_Df  den_Df  p
+  old_opts <- options(show.signif.stars = FALSE)
+  on.exit(options(old_opts), add = TRUE)
+  txt      <- capture.output(print(manova_obj))
+  reg_line <- txt[grepl("^region", txt)][1]
+  toks     <- strsplit(trimws(reg_line), "[[:space:]]+")[[1]]
+  num <- function(x) as.numeric(sub("^[<>]", "", x))   # e.g. "<2e-16"
   data.frame(
-    Pillai   = as.numeric(toks[3]),
-    F_approx = as.numeric(toks[4]),
-    df1      = as.numeric(toks[5]),
-    df2      = as.numeric(toks[6]),
-    p        = as.numeric(sub("\\*+$", "", toks[7]))
+    Pillai   = num(toks[3]),
+    F_approx = num(toks[4]),
+    df1      = num(toks[5]),
+    df2      = num(toks[6]),
+    p        = num(toks[7])
   )
 }
 

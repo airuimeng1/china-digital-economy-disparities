@@ -32,13 +32,15 @@ print(sw_tab)
 
 ## Per-cell Mardia (because MANOVA assumes MVN within each cell)
 cat("\n## Multivariate normality within each region x period cell ##\n")
-mvn_summary <- do.call(rbind, lapply(split(as.data.frame(Y), dat$cell), function(blk) {
+mvn_summary <- do.call(rbind, lapply(levels(dat$cell), function(cl) {
+  blk <- as.data.frame(Y)[dat$cell == cl, , drop = FALSE]
   res <- try(MVN::mvn(blk, mvn_test = "mardia", descriptives = FALSE, tidy = TRUE),
              silent = TRUE)
   if (inherits(res, "try-error")) return(NULL)
-  res$multivariate_normality
+  out <- res$multivariate_normality
+  out$cell <- cl          # label each cell's own rows, however many there are
+  out
 }))
-mvn_summary$cell <- rep(levels(dat$cell), each = 2)
 mvn_summary <- mvn_summary[, c("cell", "Test", "Statistic", "p.value", "MVN")]
 print(mvn_summary, row.names = FALSE)
 write.csv(mvn_summary, file.path(TBL_DIR, "04_mvn_per_cell.csv"), row.names = FALSE)

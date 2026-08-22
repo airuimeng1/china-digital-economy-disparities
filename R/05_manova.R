@@ -33,14 +33,8 @@ cat("\n--- Roy ---\n");              print(mvn_roy)
 cat("\n## Multivariate effect sizes (partial eta^2 via Pillai) ##\n")
 es <- heplots::etasq(fit, test.statistic = "Pillai", anova = TRUE)
 print(es)
-write.csv(as.data.frame(unclass(es)),
-          file.path(TBL_DIR, "05_manova_effectsizes.csv"))
-
-## Save MANOVA tables
-manova_summary <- function(m, name) {
-  s <- summary(m)
-  s$multivariate.tests
-}
+es_df <- cbind(Term = rownames(es), as.data.frame(unclass(es)))
+write.csv(es_df, file.path(TBL_DIR, "05_manova_effectsizes.csv"), row.names = FALSE)
 
 ## ---- 3. Follow-up univariate ANOVAs per DV ----
 cat("\n## Follow-up: univariate ANOVAs (Type II) per DV ##\n")
@@ -85,7 +79,9 @@ for (v in DV) {
   print(gh)
 }
 gh_compiled <- do.call(rbind, lapply(names(gh_all), function(v) {
-  d <- as.data.frame(gh_all[[v]]); d$DV <- v; d
+  d <- as.data.frame(gh_all[[v]])
+  names(d)[names(d) == ".y."] <- "DV"   # rstatix already stores the DV here
+  d
 }))
 write.csv(gh_compiled, file.path(TBL_DIR, "05_games_howell_region.csv"), row.names = FALSE)
 
@@ -107,9 +103,10 @@ print(period_tab, row.names = FALSE)
 write.csv(period_tab, file.path(TBL_DIR, "05_period_ttest.csv"), row.names = FALSE)
 
 ## ---- 6. Visualisations ----
-library(scales)
 plot_df <- dat %>%
   pivot_longer(all_of(DV), names_to = "PC", values_to = "score")
+## Labels carried over from the Varimax-rotated solution in 02_pca.R (RC1..RC4);
+## the DVs themselves are the UNROTATED, mutually orthogonal scores PC1..PC4.
 pc_labels <- c(PC1 = "PC1: Industry & Innovation Scale",
                PC2 = "PC2: Per-capita Penetration",
                PC3 = "PC3: Infrastructure Connectivity",

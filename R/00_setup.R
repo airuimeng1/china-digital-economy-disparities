@@ -1,6 +1,6 @@
 ## ============================================================
 ## 00_setup.R  —  Common setup for all analysis scripts
-## HUDM 6122 Final Project: PCA + Factorial MANOVA on
+## PCA + Factorial MANOVA on
 ## China Provincial Digital Economy Development (2013–2022)
 ## ============================================================
 
@@ -19,7 +19,9 @@ suppressPackageStartupMessages({
 })
 
 ## All paths are relative to the repository root.
-## Scripts assume getwd() is the repo root: setwd("path/to/hudm6122-pca-manova").
+## Scripts assume getwd() is the repo root: setwd("path/to/detailed-pca-manova-anl").
+if (!file.exists("data/panel_data.xlsx"))
+  stop("Set the working directory to the repository root before sourcing R/00_setup.R.")
 PROJ_ROOT <- normalizePath(".", mustWork = TRUE)
 DATA_DIR  <- file.path(PROJ_ROOT, "data")
 OUT_DIR   <- file.path(PROJ_ROOT, "outputs")

@@ -41,7 +41,8 @@ dedi_100 <- rescale01(dedi_raw) * 100
 
 panel_out <- df[, c("year","id","province","prov_en","region","period")]
 panel_out <- cbind(panel_out, scores_signed, DEDI_raw = dedi_raw, DEDI = dedi_100)
-write.csv(panel_out, file.path(OUT_DIR, "panel_dedi.csv"), row.names = FALSE)
+write.csv(panel_out, file.path(OUT_DIR, "panel_dedi.csv"), row.names = FALSE,
+          fileEncoding = "UTF-8")
 
 ## ---- 3. National DEDI trajectory by region (yearly mean) ----
 region_year <- panel_out %>%

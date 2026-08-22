@@ -5,8 +5,10 @@ A Multivariate Analysis Using PCA and Factorial MANOVA, 2013–2022**
 
 Airui Meng
 
+![Regional Digital Economy Development Index, 2013–2022](outputs/figures/03_region_trend.png)
+
 This repository contains the R analysis pipeline, panel data, intermediate outputs, and
-typeset report for a course project that constructs a Digital Economy Development Index
+typeset report for a study that constructs a Digital Economy Development Index
 (DEDI) for 31 mainland Chinese provinces, 2013–2022, and tests for regional and temporal
 differences via a 4 × 2 factorial MANOVA on retained principal-component scores.
 
@@ -15,26 +17,31 @@ differences via a 4 × 2 factorial MANOVA on retained principal-component scores
 ## Headline results
 
 - **PCA**: 4 components retained (Kaiser + Cumulative ≥ 80% rule), explaining 85.8% of
-  variance after log-transforming heavy-skew indicators and Varimax-rotating the retained
-  loadings. KMO = 0.904 ("meritorious"); Bartlett χ²(231) = 11553.82, *p* < .001.
+  variance after log-transforming heavy-skew indicators. Varimax rotation is applied to the
+  retained loadings for interpretation only; all inference uses the unrotated, mutually
+  orthogonal component scores. KMO = 0.904 ("meritorious"); Bartlett χ²(231) = 11553.82, *p* < .001.
 - **Factorial MANOVA** (DVs = PC1–PC4, *n* = 310 province-years):
   - Region main effect: Pillai *V* = 0.754, *F*(12, 903) = 25.25, *p* < .001, partial η² = 0.25.
   - Period main effect: Pillai *V* = 0.719, *F*(4, 299) = 191.12, *p* < .001, partial η² = 0.72.
   - Region × Period interaction: **non-significant** (*V* = 0.021, *p* = .892, partial η² = 0.007).
 - **Substantive interpretation**: every region advanced markedly between 2013–2017 and
   2018–2022, but the relative rank-ordering of regions on a four-dimensional digital-economy
-  construct has not changed — *σ*-divergence in absolute spread alongside
-  *β*-convergence in relative spread.
+  construct has not changed — dispersion widens in absolute terms (SD of DEDI 15.4 → 18.0)
+  while narrowing in relative terms (CV 0.43 → 0.32).
 - Sensitivity analyses (single-year MANOVA on 2018/2019/2020, year-by-year PCA
-  loading stability, and outlier-removed refit) corroborate the main conclusions.
+  loading stability, and outlier-removed refit) corroborate the main conclusions;
+  the one caveat is PC3 (infrastructure), whose year-specific loadings track the
+  full-panel solution only weakly (*r* = 0.33–0.42, versus 0.80–0.97 for PC1, PC2, PC4),
+  reflecting the changing composition of "infrastructure" over the decade.
 
 ---
 
 ## Repository structure
 
 ```
-hudm6122-pca-manova/
+detailed-pca-manova-anl/
 ├── README.md                       This file.
+├── LICENSE                         MIT licence for the code.
 ├── data/
 │   ├── panel_data.xlsx              Cleaned province × year panel, 22 indicators.
 │   ├── original_data.xlsx           Raw indicators before interpolation.
@@ -47,7 +54,8 @@ hudm6122-pca-manova/
 │   ├── 03_dedi.R                    Variance-weighted DEDI composite (0–100 scale).
 │   ├── 04_assumptions.R             Mardia, Box's M, Levene, Mahalanobis diagnostics.
 │   ├── 05_manova.R                  Factorial MANOVA + univariate ANOVAs + Games–Howell.
-│   └── 06_sensitivity.R             Single-year MANOVA, PCA stability, outlier-drop refit.
+│   ├── 06_sensitivity.R             Single-year MANOVA, PCA stability, outlier-drop refit.
+│   └── run_all.R                    Runs stages 01–06 in order.
 ├── outputs/
 │   ├── figures/                     8 PNG figures at 300 dpi.
 │   ├── tables/                      16 CSV tables.
@@ -58,7 +66,7 @@ hudm6122-pca-manova/
 │   └── assumption_checks.rds        Mardia, Box's M, Levene, Mahalanobis.
 └── report/
     ├── final_report.pdf             Typeset write-up (17 pages).
-    └── *.png                        Figures used by the report.
+    └── final_report.tex             LaTeX source for the write-up.
 ```
 
 ---
@@ -69,7 +77,7 @@ The pipeline is staged so that each step writes intermediate artefacts that the 
 step reads back. Run from the repository root:
 
 ```r
-setwd("path/to/hudm6122-pca-manova")
+setwd("path/to/detailed-pca-manova-anl")
 
 ## Stage 0: shared setup (loaded automatically by each downstream script)
 source("R/00_setup.R")
@@ -108,6 +116,21 @@ install.packages(c(
   "knitr", "scales"
 ))
 ```
+
+The committed outputs were last regenerated under R 4.5.2. To run the whole pipeline in one command from the repo root:
+
+```bash
+for s in 01_descriptive 02_pca 03_dedi 04_assumptions 05_manova 06_sensitivity; do
+  Rscript R/$s.R
+done
+```
+
+`R/run_all.R` runs the same sequence in-session (`source("R/run_all.R")` from the repo root).
+
+To re-typeset the report, `cd report/` and run `pdflatex final_report.tex` twice (any
+TeX Live installation providing `amsmath`, `booktabs`, `tabularx`, `multirow`,
+`ragged2e`, `subcaption`, `natbib`, and `hyperref` will do; figures are pulled from
+`outputs/figures/`).
 
 ---
 
@@ -156,3 +179,12 @@ footprint is small (only `x5` IPv4 addresses at 20.3% of cells, `x13` mobile int
 users at 8.4%, and `x21` R&D institutions at 0.3% required any interpolation).
 
 ---
+
+## License and data
+
+Code in this repository is released under the MIT License (see `LICENSE`).
+
+The underlying indicators are public statistical releases of the Chinese government;
+the Digital Inclusive Finance Index is produced by the Digital Finance Research
+Center, Peking University. They are redistributed here only so that the analysis can
+be reproduced, and remain subject to the terms of their original publishers.
